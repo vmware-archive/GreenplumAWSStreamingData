@@ -12,6 +12,7 @@ package io.greenplum.demo.streaming.model;
  limitations under the License.
  *********************************************************************************************/
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -252,7 +253,6 @@ public class Transaction implements Serializable {
             return null;
         }
     }
-
     public String toJsonAsString() {
         try {
             return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(this);
@@ -305,6 +305,7 @@ public class Transaction implements Serializable {
      * @param delimiter
      * @return
      */
+    @JsonIgnore
     public String toCSV(String delimiter) {
         if (delimiter == null || delimiter.trim().length() == 0) {
             delimiter = ",";
@@ -336,6 +337,7 @@ public class Transaction implements Serializable {
      * Get header row for CSV
      * @return String
      */
+    @JsonIgnore
     public String getCSVHeader() {
         String header = "\"account_id\",\"account_lat\",\"account_long\",\"account_number\",\"card_type\",\"fraud_flag\"," +
                 "\"location_id\",\"merchant_city\",\"merchant_city_alias\",\"merchant_lat\",\"merchant_long\"," +
@@ -343,12 +345,13 @@ public class Transaction implements Serializable {
                 "\"transaction_date\",\"transaction_id\"" + "\n";
         return header;
     }
-
+    @JsonIgnore
     public String getPostingDateStr() {
         SimpleDateFormat dtFmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String postingDateStr = dtFmt.format(getPostingDate());
         return postingDateStr;
     }
+    @JsonIgnore
     public String getTransactionDateStr() {
         SimpleDateFormat dtFmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String transactionDateStr = dtFmt.format(getTransactionDate());

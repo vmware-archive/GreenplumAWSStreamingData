@@ -9,6 +9,9 @@ import com.amazonaws.services.kinesisfirehose.AmazonKinesisFirehoseClientBuilder
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.KinesisEvent;
+import com.amazonaws.services.sqs.AmazonSQS;
+import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
+import com.amazonaws.services.sqs.model.SendMessageRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.greenplum.demo.streaming.model.Transaction;
@@ -18,9 +21,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * @author sridhar paladugu
@@ -32,9 +33,10 @@ import java.util.Properties;
 public class CreditTransactionsFirehoseHandler implements RequestHandler<KinesisEvent , Void> {
 
     private String region;
+    private String scoringQueueUrl;
     private String deliveryStreamName ;
     private AmazonKinesisFirehose amazonKinesisFirehose;
-
+    private AmazonSQS amazonSQS;
     static final Properties props = new Properties();
     static {
         try {
@@ -48,7 +50,7 @@ public class CreditTransactionsFirehoseHandler implements RequestHandler<Kinesis
     }
 
     public void init(Context context) {
-        context.getLogger().log("Initializing Kinesis firehose.......");
+        context.getLogger().log("Initializing Kinesis firehose .......");
         region = props.get("awsRegion").toString();
         deliveryStreamName = props.get("deliveryStreamName").toString();
         AmazonKinesisFirehoseClientBuilder amazonKinesisFirehoseClientBuilder = AmazonKinesisFirehoseClientBuilder.standard();
@@ -58,6 +60,7 @@ public class CreditTransactionsFirehoseHandler implements RequestHandler<Kinesis
         amazonKinesisFirehoseClientBuilder.setRegion(region);
         amazonKinesisFirehose = amazonKinesisFirehoseClientBuilder.build();
         context.getLogger().log("Finished Initializing Kinesis firehose!");
+        amazonSQS = AmazonSQSClientBuilder.defaultClient();
     }
 
 
@@ -68,27 +71,38 @@ public class CreditTransactionsFirehoseHandler implements RequestHandler<Kinesis
         }
         int countOfRecords = kinesisEvent.getRecords().size();
         context.getLogger().log("Received "+ countOfRecords +" transactions in the current batch.");
-        List<Transaction> transactionList = new ArrayList<Transaction>();
-        StringBuffer csv = null;
+        Map<String, String> transactionJsonMap = new HashMap<String, String>();
+        StringBuffer csv = new StringBuffer();;
         for (KinesisEvent.KinesisEventRecord rec : kinesisEvent.getRecords()) {
             Transaction transaction = Transaction.fromJsonAsBytes(rec.getKinesis().getData().array());
             if (transaction == null) {
                 context.getLogger().log("Transaction received as null, so skipping record for partition -> " + rec.getKinesis().getPartitionKey());
             } else {
-                if (csv == null) {
-                    csv = new StringBuffer();
-//                    csv.append(transaction.getCSVHeader());
-                }
+                // to s3 as csv file with all transactions in the batch
                 csv.append(transaction.toCSV(","));
+                //individual events to SQS for scoring
+                transactionJsonMap.put(transaction.getTransactionId(), transaction.toJsonAsString());
             }
 
         }
-        context.getLogger().log("Storing " + countOfRecords + " events to s3 via firehose ....");
+        context.getLogger().log("Storing " + countOfRecords + " events to kinesis firehose ....");
         Record record = new Record().withData(ByteBuffer.wrap(csv.toString().getBytes()));
         PutRecordRequest putRecordRequest  = new PutRecordRequest()
                 .withDeliveryStreamName(deliveryStreamName).withRecord(record);
         amazonKinesisFirehose.putRecord(putRecordRequest);
         context.getLogger().log("Delivered transaction events to S3!");
+
+        context.getLogger().log("Dispatching " + countOfRecords + " events to "+ scoringQueueUrl + " queue....");
+        scoringQueueUrl = props.get("scoringQueueUrl").toString();
+        transactionJsonMap.forEach((id, transaction) ->{
+            SendMessageRequest sendMessageRequest = new SendMessageRequest(scoringQueueUrl, transaction);
+            sendMessageRequest.setMessageGroupId("creditTransToScoreGroup");
+            sendMessageRequest.setMessageDeduplicationId(id);
+            amazonSQS.sendMessage(sendMessageRequest);
+        });
+        context.getLogger().log("Delivered transaction events to SQS!");
+        context.getLogger().log("Finished the event batch!");
+
         return null;
     }
 }
