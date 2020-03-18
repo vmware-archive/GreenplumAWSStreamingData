@@ -1,0 +1,58 @@
+spring:
+  application:
+    name: Simulate Merchant Transaction Events
+  kafka:
+    bootstrap-servers:
+      - localhost:9092
+
+
+logging:
+  level:
+    org.springframework: DEBUG
+    io.greenplum.demo: DEBUG
+
+streamer:
+  # batch of payload per iteration
+  transactionsnumber: 100
+
+  # num of seconds to wait before each batch iteration
+  sleepbetweeniterations: 10
+
+  # Flag every x records a record as fraud and fabricate fraud data
+  fraudforevery: 25
+
+  # decorator to store fraud flag in payload.
+  storefraudflag: true
+
+  # The below indicates the dispatch batch of records or single record at a time.
+  # valida values are "batch or single"
+  dispatchstyle: batch
+
+  # The below property indicates where to sink the generated transactions.
+  # possible value is one of "console (default), kinesis
+  target: "kinesis"
+
+  # if sink is kafka then we need to specify the topic along with
+  # kafka servers info at top in spring context attributes (spring.kafka...)
+  kafkatopic: "credit_transactions"
+
+  # The below is for storing the generated the JSON payload to local mounted
+  # file store. The mount can be local directory or NFS
+  targetfilesloctation: "/data/"
+
+  # Number of transactions that you want to pack in a file
+  transactionsperfile: 10
+
+  # Number of seconds to pause before each file save.
+  sleepbetweenfiles: 0
+
+  # The below 2 is for Kinesis stream sink or s3 sink.
+  awsaccesskey:
+  awssecretkey:
+
+  # This is the Kinesis stream name that will be used to deliver the stream
+  streamname: crtrans
+
+  # Amazon reqion where the Kinesis stream is located
+  regionname: us-east-1
+
