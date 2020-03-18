@@ -4,7 +4,10 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.S3Event;
 import com.amazonaws.services.s3.event.S3EventNotification;
-
+/**
+ * @author Sridhar Paladugu
+ * @version 1.0
+ */
 public class S3EventHandler implements RequestHandler<S3Event, Void> {
 
     @Override

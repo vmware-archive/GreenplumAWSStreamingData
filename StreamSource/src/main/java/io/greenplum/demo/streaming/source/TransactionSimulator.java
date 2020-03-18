@@ -42,7 +42,7 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 @Component
 public class TransactionSimulator {
-    private static final Log log = LogFactory.getLog(TransactionGenerator.class.getName());
+    private static final Log log = LogFactory.getLog(TransactionSimulator.class.getName());
     private final TransactionsSourceProperties appProperties;
     private List<Location> locations;
     private List<Account> accounts;
