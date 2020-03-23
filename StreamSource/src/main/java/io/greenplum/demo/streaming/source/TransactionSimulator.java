@@ -36,6 +36,9 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+
 /**
  * @author Sridhar Paladugu
  * @version 1.0
@@ -50,6 +53,7 @@ public class TransactionSimulator {
     private Map<String, List<Integer>> stateLocationIdsMap;
     private Map<String ,List<Location>> stateLocationsMap;
     private Map<String ,List<Location>> accountCloseLocations;
+    private static final AtomicInteger tranIdAtomicInteger = new AtomicInteger((int)(System.currentTimeMillis()/1000));
 
     /**
      * Constructor
@@ -82,7 +86,9 @@ public class TransactionSimulator {
             throw new RuntimeException(e);
         }
     }
-
+    public static Integer getNextTransactionId(){
+        return tranIdAtomicInteger.incrementAndGet();
+    }
     /**
      * Generates a batch of transactions based on configuration parameters.
      * @return List of {@link Transaction} objects.
@@ -287,7 +293,7 @@ public class TransactionSimulator {
         Location location = pickTransactionLocation(account);
         Double transactionAmount = null;
         Transaction transaction = new Transaction();
-        transaction.setTransactionId(UUID.randomUUID().toString());
+        transaction.setTransactionId(getNextTransactionId());
         transaction.setRlbLocationKey(location.getRlbLocationKey());
         transaction.setAccountNumber(account.getAccountNumber());
         transaction.setAccountId(account.getAccountId());

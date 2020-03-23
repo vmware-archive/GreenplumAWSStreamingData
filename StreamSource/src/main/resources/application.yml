@@ -13,7 +13,7 @@ logging:
 
 streamer:
   # batch of payload per iteration
-  transactionsnumber: 100
+  transactionsnumber: 10
 
   # num of seconds to wait before each batch iteration
   sleepbetweeniterations: 10
@@ -47,7 +47,7 @@ streamer:
   sleepbetweenfiles: 0
 
   # The below 2 is for Kinesis stream sink or s3 sink.
-  awsaccesskey:
+  awsaccesskey: 
   awssecretkey:
 
   # This is the Kinesis stream name that will be used to deliver the stream

@@ -17,6 +17,7 @@
         <module>StreamSource</module>
         <module>KinesisFirehoseLambdaSink</module>
         <module>S3GreenplumLambdaSink</module>
+        <module>SQSMLEventHandler</module>
     </modules>
 
 

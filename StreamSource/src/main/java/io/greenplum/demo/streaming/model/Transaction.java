@@ -32,7 +32,7 @@ public class Transaction implements Serializable {
     private static final long serialVersionUID = 8780959226199358281L;
 
     @JsonProperty("transaction_id")
-    String transactionId;
+    int transactionId;
     @JsonProperty("rlb_location_key")
     private int rlbLocationKey;
     @JsonProperty("location_id")
@@ -72,11 +72,11 @@ public class Transaction implements Serializable {
     @JsonProperty("fraud_flag")
     private Boolean fraudFlag;
 
-    public String getTransactionId() {
+    public Integer getTransactionId() {
         return transactionId;
     }
 
-    public void setTransactionId(String transactionId) {
+    public void setTransactionId(Integer transactionId) {
         this.transactionId = transactionId;
     }
 

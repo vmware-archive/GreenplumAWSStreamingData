@@ -71,9 +71,11 @@ public class GreenplumWriter {
             .append(" rlb_location_key int," )
             .append(" transaction_amount double precision," )
             .append(" transaction_date text," )
-            .append(" transaction_id text" )
+            .append(" transaction_id bigint" )
             .append( ") ")
-            .append(" location('pxf://sppde-greenplumstreams/")
+            .append(" location('pxf://") //sppde-greenplumstreams/")
+            .append(System.getenv("S3_BUCKET"))
+            .append("/")
             .append(s3key)
             .append("?profile=s3:text&SERVER=s3srvcfg')" )
             .append("format 'CSV'");
