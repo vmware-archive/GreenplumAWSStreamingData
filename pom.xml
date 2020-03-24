@@ -18,6 +18,8 @@
         <module>KinesisFirehoseLambdaSink</module>
         <module>S3GreenplumLambdaSink</module>
         <module>SQSMLEventHandler</module>
+        <module>SQSMLScoredEventsFirehoseLambda</module>
+        <module>S3GreenplumScoredTransactionsLambdaSink</module>
     </modules>
 
 

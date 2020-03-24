@@ -85,8 +85,6 @@ public class CreditTransactionsFirehoseHandler implements RequestHandler<Kinesis
         context.getLogger().log("Dispatching " + countOfRecords + " events to "+ scoringQueueUrl + " queue....");
         transactionJsonMap.forEach((id, transaction) ->{
             SendMessageRequest sendMessageRequest = new SendMessageRequest(scoringQueueUrl, transaction);
-//            sendMessageRequest.setMessageGroupId("creditTransToScoreGroup");
-//            sendMessageRequest.setMessageDeduplicationId(id.toString());
             context.getLogger().log("ID --->> "+ id);
             amazonSQS.sendMessage(sendMessageRequest);
         });
