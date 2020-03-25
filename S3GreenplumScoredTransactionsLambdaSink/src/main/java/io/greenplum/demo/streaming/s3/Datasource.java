@@ -13,9 +13,15 @@
 
 package io.greenplum.demo.streaming.s3;
 
+import com.amazonaws.services.kms.AWSKMS;
+import com.amazonaws.services.kms.AWSKMSClientBuilder;
+import com.amazonaws.services.kms.model.DecryptRequest;
+import com.amazonaws.util.Base64;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -31,14 +37,33 @@ public class Datasource {
     private static HikariDataSource ds;
     static {
         HikariConfig hikariConfig = new HikariConfig();
-        hikariConfig.setJdbcUrl( System.getenv("GP_JDBC_URL") );
-        hikariConfig.setUsername( System.getenv("GP_USER"));
-        hikariConfig.setPassword( System.getenv("GP_PWD") );
+        hikariConfig.setJdbcUrl( decryptKey("GP_JDBC_URL") );
+        hikariConfig.setUsername( decryptKey("GP_USER"));
+        hikariConfig.setPassword( decryptKey("GP_PWD") );
         hikariConfig.addDataSourceProperty( "cachePrepStmts" , "true" );
         hikariConfig.addDataSourceProperty( "prepStmtCacheSize" , "250" );
         hikariConfig.addDataSourceProperty( "prepStmtCacheSqlLimit" , "2048" );
         ds = new HikariDataSource(hikariConfig);
     }
+    /**
+     * Decrypt the lambda console key
+     *
+     * @param keyName
+     * @return
+     */
+    private static String decryptKey(String keyName) {
+        System.out.println("Decrypting key");
+        byte[] encryptedKey = Base64.decode(System.getenv(keyName));
+
+        AWSKMS client = AWSKMSClientBuilder.defaultClient();
+
+        DecryptRequest request = new DecryptRequest()
+                .withCiphertextBlob(ByteBuffer.wrap(encryptedKey));
+
+        ByteBuffer plainTextKey = client.decrypt(request).getPlaintext();
+        return new String(plainTextKey.array(), Charset.forName("UTF-8"));
+    }
+
     private Datasource() {}
 
     public static Connection getConnection() throws SQLException {

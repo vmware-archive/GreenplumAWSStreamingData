@@ -19,7 +19,7 @@ streamer:
   sleepbetweeniterations: 10
 
   # Flag every x records a record as fraud and fabricate fraud data
-  fraudforevery: 25
+  fraudforevery: 5
 
   # decorator to store fraud flag in payload.
   storefraudflag: true
@@ -30,7 +30,7 @@ streamer:
 
   # The below property indicates where to sink the generated transactions.
   # possible value is one of "console (default), kinesis
-  target: "kinesis"
+  target: kinesis
 
   # if sink is kafka then we need to specify the topic along with
   # kafka servers info at top in spring context attributes (spring.kafka...)
@@ -47,12 +47,12 @@ streamer:
   sleepbetweenfiles: 0
 
   # The below 2 is for Kinesis stream sink or s3 sink.
-  awsaccesskey: 
+  awsaccesskey:
   awssecretkey:
 
   # This is the Kinesis stream name that will be used to deliver the stream
-  streamname: crtrans
+  streamname:
 
   # Amazon reqion where the Kinesis stream is located
-  regionname: us-east-1
+  regionname:
 

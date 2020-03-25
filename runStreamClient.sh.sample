@@ -1,0 +1,10 @@
+#!/bin/bash
+
+java -jar StreamSource/target/StreamSource-1.0.0-SNAPSHOT.jar \
+	--streamer.transactionsnumber=10 \
+	--streamer.fraudforevery=5  \
+	--streamer.target=kinesis \
+	--streamer.streamname=ctrans_kinesis_data_Stream \
+	--streamer.regionname=us-east-1 \
+	--streamer.awsaccesskey= \
+	--streamer.awssecretkey=
