@@ -13,7 +13,7 @@ The streaming part is built with all AWS cloud native tooling;
 * RTSMadlib to deploy ML models on AWS EKS.
 
 The overall folow can be shown as ;
-![](/Vmware Greenplum Streaming ML Use case on Amazon AWS .svg)
+![](/VmwareGreenplumStreamingMLUsecaseOnAmazonAWS.svg)
 
 
 
