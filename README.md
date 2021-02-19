@@ -12,6 +12,8 @@ The streaming part is built with all AWS cloud native tooling;
 * AWS Lambda
 * RTSMadlib to deploy ML models on AWS EKS.
 
+## The Document embeds a [demo](https://onevmw-my.sharepoint.com/:b:/g/personal/spaladugu_vmware_com/Efl7dpRv5-xEm3yAqi0g6EUBcZdhd3py5wVpYrehJB332Q?e=QsSOzu)
+
 The overall folow can be shown as ;
 ![](/VmwareGreenplumStreamingMLUsecaseOnAmazonAWS.svg)
 
