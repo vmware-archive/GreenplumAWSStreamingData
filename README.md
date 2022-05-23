@@ -1,3 +1,5 @@
+**VMware has ended active development of this project, this repository will no longer be updated**
+
 # GreenplumAWSStreamingData
 
 This Git project goal is to demonstrate Closed loop analytics with Greenplum leveraging AWS cloud native tools.
